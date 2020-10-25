@@ -1,12 +1,23 @@
 #!/bin/bash
 
+# exit immediately on error
 set -e
+# fail on undeclared variables
+set -u 
 
-source $(pwd)/common.sh
+# Grab the directory of the scripts, in case the script is invoked from a different path
+SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+# Useful routines in common.sh
+. "${SCRIPTS_DIR}/common.sh"
+
 
 MICROK8S_CHANNEL="1.18/stable"
 
 
+# ====================================================
+#   Help screen
+# ----------------------------------------------------
 function help() {
     echo "./manage.sh <command>"
     echo "  help                        - this help"
@@ -15,7 +26,9 @@ function help() {
     echo "  install                     - install microk8s"
 }
 
-
+# ====================================================
+#   Create aliases
+# ----------------------------------------------------
 function create_aliases() {
     if [ -f ~/.bash_aliases ]; then
         [ -z "$(cat ~/.bash_aliases | grep kubectl)" ] && {
@@ -27,7 +40,9 @@ function create_aliases() {
     source ~/.bash_aliases
 }
 
-
+# ====================================================
+#   Fix flannel subnet configuration
+# ----------------------------------------------------
 function fix_flannel_subnet_conf() {
     FLANNEL_SUBNET_CONF="/var/snap/microk8s/common/run/flannel/subnet.env"
     sudo mkdir -p /var/snap/microk8s/common/run/flannel/ && \
@@ -37,7 +52,9 @@ function fix_flannel_subnet_conf() {
     echo "FLANNEL_IPMASQ=false" | sudo tee -a ${FLANNEL_SUBNET_CONF}
 }
 
-
+# ====================================================
+#   Install microk8s
+# ----------------------------------------------------
 function install() {
     info "Install microk8s, 1.18/stable" && \
         sudo snap install microk8s --classic --channel ${MICROK8S_CHANNEL} && \
@@ -49,6 +66,7 @@ function install() {
         sudo microk8s enable \
             dns helm3 storage registry 
 }
+
 
 $@
 

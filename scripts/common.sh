@@ -1,6 +1,16 @@
 #!/bin/bash
 
-# colors for printing
+# exit immediately on error
+set -e
+# fail on undeclared variables
+set -u 
+
+# Grab the directory of the scripts, in case the script is invoked from a different path
+SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+# ====================================================
+#   Colors for printing
+# ----------------------------------------------------
 RED='\033[1;31m'
 BLUE='\033[0;36m'
 NC='\033[0m' # No Color
